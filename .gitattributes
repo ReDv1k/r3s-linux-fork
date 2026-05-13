@@ -1,0 +1,7 @@
+*.c   diff=cpp
+*.h   diff=cpp
+*.dtsi diff=dts
+*.dts  diff=dts
+*.ko filter=lfs diff=lfs merge=lfs -text
+vmlinux filter=lfs diff=lfs merge=lfs -text
+vmlinux* filter=lfs diff=lfs merge=lfs -text
