@@ -1042,10 +1042,11 @@ static int rkvenc_devfreq_init(struct mpp_dev *mpp)
 	}
 
 	rockchip_get_opp_data(rockchip_rkvenc_of_match, &opp_info);
-	ret = rockchip_init_opp_table(mpp->dev, &opp_info, "leakage", "venc");
+	ret = rockchip_init_opp_table(mpp->dev, &opp_info, NULL, "venc");
 	if (ret) {
-		dev_err(mpp->dev, "failed to init_opp_table\n");
-		return ret;
+		dev_dbg(mpp->dev, 
+				"power model data unavailable, continuing without leakage info\n");
+		ret = 0;
 	}
 
 	ret = devfreq_add_governor(&devfreq_venc_ondemand);
@@ -1075,7 +1076,8 @@ static int rkvenc_devfreq_init(struct mpp_dev *mpp)
 							"venc_leakage");
 	if (IS_ERR_OR_NULL(enc->model_data)) {
 		enc->model_data = NULL;
-		dev_err(mpp->dev, "failed to initialize power model\n");
+		dev_dbg(mpp->dev,
+				"venc leakage does not exist, using dynamic-coefficient\n");
 	} else if (enc->model_data->dynamic_coefficient) {
 		venc_dcp->dyn_power_coeff =
 			enc->model_data->dynamic_coefficient;
