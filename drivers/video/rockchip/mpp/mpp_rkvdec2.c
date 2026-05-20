@@ -860,10 +860,11 @@ static int rkvdec2_devfreq_init(struct mpp_dev *mpp)
 		return 0;
 	}
 
-	ret = rockchip_init_opp_table(mpp->dev, NULL, "leakage", "vdec");
+	ret = rockchip_init_opp_table(mpp->dev, NULL, NULL, "vdec");
 	if (ret) {
-		dev_err(mpp->dev, "failed to init_opp_table\n");
-		return ret;
+		dev_dbg(mpp->dev, 
+			"power model data unavailable, continuing without leakage info\n");
+		ret = 0;
 	}
 
 	ret = devfreq_add_governor(&devfreq_vdec2_ondemand);
@@ -893,7 +894,8 @@ static int rkvdec2_devfreq_init(struct mpp_dev *mpp)
 							"vdec_leakage");
 	if (IS_ERR_OR_NULL(dec->model_data)) {
 		dec->model_data = NULL;
-		dev_err(mpp->dev, "failed to initialize power model\n");
+		dev_dbg(mpp->dev, 
+				"vdec_leakage does not exist, using dynamic-coefficient\n");
 	} else if (dec->model_data->dynamic_coefficient) {
 		vdec2_dcp->dyn_power_coeff =
 			dec->model_data->dynamic_coefficient;
