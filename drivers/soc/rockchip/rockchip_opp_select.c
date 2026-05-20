@@ -2081,8 +2081,10 @@ int rockchip_init_opp_table(struct device *dev, struct rockchip_opp_info *info,
 next:
 	rockchip_get_soc_info(dev, np, &bin, &process);
 	rockchip_init_pvtpll_table(info, bin);
-	rockchip_get_scale_volt_sel(dev, lkg_name, reg_name, bin, process,
+	if (lkg_name) {
+		rockchip_get_scale_volt_sel(dev, lkg_name, reg_name, bin, process,
 				    &scale, &volt_sel);
+	}
 	if (info && info->data && info->data->set_soc_info)
 		info->data->set_soc_info(dev, np, bin, process, volt_sel);
 	rockchip_set_opp_prop_name(dev, process, volt_sel);
