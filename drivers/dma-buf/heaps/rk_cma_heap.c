@@ -544,6 +544,7 @@ static int set_heap_dev_dma(struct device *heap_dev)
 static int __add_cma_heap(struct cma *cma, void *data)
 {
 	struct cma_heap *cma_heap, *cma_uncached_heap;
+	struct dma_heap *android_heap = NULL;
 	struct dma_heap_export_info exp_info;
 	int ret;
 
@@ -579,16 +580,27 @@ static int __add_cma_heap(struct cma *cma, void *data)
 		ret = PTR_ERR(cma_uncached_heap->heap);
 		goto free_uncached_cma_heap;
 	}
+    /* Android-compatible alias heap */
+	exp_info.name = "system-uncached-dma32";
 
+	android_heap = dma_heap_add(&exp_info);
+	if (IS_ERR(android_heap)) {
+		ret = PTR_ERR(android_heap);
+		goto put_uncached_cma_heap;	
+	}
 	ret = set_heap_dev_dma(dma_heap_get_dev(cma_uncached_heap->heap));
-	if (ret)
-		goto put_uncached_cma_heap;
+	if (ret) 
+		goto put_android_heap;
 
+	ret = set_heap_dev_dma(dma_heap_get_dev(android_heap));
+	if (ret)
+		goto put_android_heap;
 	mb(); /* make sure we only set allocate after dma_mask is set */
 	cma_uncached_heap_ops.allocate = cma_uncached_heap_allocate;
 
 	return 0;
-
+put_android_heap:
+	dma_heap_put(android_heap);
 put_uncached_cma_heap:
 	dma_heap_put(cma_uncached_heap->heap);
 free_uncached_cma_heap:
