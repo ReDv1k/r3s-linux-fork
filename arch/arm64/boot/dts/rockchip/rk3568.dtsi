@@ -1667,7 +1667,7 @@
 			91001    100000  2
 		>;
 		//rockchip,pvtm-ch = <0 5>;
-
+		/*
 		opp-297000000 {
 			opp-hz = /bits/ 64 <297000000>;
 			opp-microvolt = <900000>;
@@ -1675,6 +1675,7 @@
 			opp-microvolt-L1 = <875000>;
 			opp-microvolt-L2 = <875000>;
 		};
+		*/
 		opp-400000000 {
 			opp-hz = /bits/ 64 <400000000>;
 			opp-microvolt = <950000>;
@@ -1762,13 +1763,13 @@
 			84001    100000  1
 		>;
 		//rockchip,pvtm-ch = <0 5>;
-
+		/*
 		opp-297000000 {
 			opp-hz = /bits/ 64 <297000000>;
 			opp-microvolt = <900000>;
 			opp-microvolt-L0 = <900000>;
 			opp-microvolt-L1 = <875000>;
-		};
+		}; */
 		opp-400000000 {
 			opp-hz = /bits/ 64 <400000000>;
 			opp-microvolt = <900000>;
