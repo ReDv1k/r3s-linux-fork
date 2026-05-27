@@ -578,6 +578,24 @@ uvc_video_clock_decode(struct uvc_streaming *stream, struct uvc_buffer *buf,
 
 	spin_lock_irqsave(&stream->clock.lock, flags);
 
+	/* If we are about to overwrite the overflow marker, reset it */
+	if (stream->clock.head == stream->clock.last_sof_overflow)
+		stream->clock.last_sof_overflow = -1;
+
+	/* Detect SOF counter overflow (when new SOF is smaller than previous) */
+	if (stream->clock.count > 0 && stream->clock.last_sof > dev_sof) {
+		if (stream->clock.last_sof_overflow != -1) {
+			unsigned int old_count = stream->clock.count;
+			unsigned int new_count;
+
+			new_count = (stream->clock.head - stream->clock.last_sof_overflow +
+				     old_count) % old_count;
+			stream->clock.count = new_count;
+		}
+		stream->clock.last_sof_overflow = stream->clock.head;
+	}
+
+	/* Add the new sample */
 	sample = &stream->clock.samples[stream->clock.head];
 	sample->dev_stc = dev_stc;
 	sample->dev_sof = dev_sof;
