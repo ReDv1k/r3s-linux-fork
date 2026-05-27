@@ -618,6 +618,7 @@ static void uvc_video_clock_reset(struct uvc_streaming *stream)
 	clock->head = 0;
 	clock->count = 0;
 	clock->last_sof = -1;
+	clock->last_sof_overflow = -1;
 	clock->sof_offset = -1;
 }
 
