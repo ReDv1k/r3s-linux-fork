@@ -623,6 +623,7 @@ struct uvc_streaming {
 		unsigned int size;
 
 		u16 last_sof;
+		int last_sof_overflow;
 		u16 sof_offset;
 
 		u8 last_scr[6];
