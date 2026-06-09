@@ -733,6 +733,69 @@
 		status = "okay";
 	};
 
+
+	rkvenc_opp_table: opp-table-venc {
+   		
+   		compatible = "operating-points-v2";
+	    	opp-300000000 {
+		  opp-hz = /bits/ 64 <300000000>;
+
+		  opp-microvolt = <1075000>;
+
+		  opp-microvolt-L0 = <1075000>;
+		  opp-microvolt-L1 = <1075000>;
+		  opp-microvolt-L2 = <1075000>;
+	    };
+	};
+	
+	h265e: h265e@ff330000 {
+	    compatible = "rockchip,rkv-encoder-v1";
+	    reg = <0x0 0xff330000 0x0 0x400>; 
+	    interrupts = <GIC_SPI 95 IRQ_TYPE_LEVEL_HIGH>;
+	    interrupt-names = "irq_enc";
+	    clocks = <&cru ACLK_H265>, <&cru PCLK_H265>,
+		       <&cru SCLK_VENC_CORE>, <&cru SCLK_VENC_DSP>,
+		       <&cru ACLK_RKVENC>, <&cru ACLK_AXISRAM>;
+	    clock-names = "aclk_vcodec", "hclk_vcodec", "clk_core",
+		            "clk_dsp", "aclk_venc", "aclk_axi2sram";
+
+	    assigned-clocks = <&cru ACLK_RKVENC>, <&cru SCLK_VENC_CORE>;
+	    assigned-clock-rates = <300000000>, <300000000>;
+	    rockchip,normal-rates = <300000000>, <0>, <300000000>;
+	    resets = <&cru SRST_RKVENC_H265_A>,
+		       <&cru SRST_RKVENC_H265_P>,
+		       <&cru SRST_RKVENC_H265_CORE>,
+		       <&cru SRST_RKVENC_H265_DSP>;
+	    reset-names = "video_a", "video_h", "video_core", "video_dsp";
+	    iommus = <&h265e_mmu>;
+	    operating-points-v2 = <&rkvenc_opp_table>;
+	    rockchip,grf = <&grf>;
+	    mode_bit = <11>;
+	    mode_ctrl = <0x40c>;
+	    allocator = <1>;
+	    name = "h265e";
+	    rockchip,srv = <&mpp_srv>;
+	    rockchip,taskqueue-node = <2>;
+	    rockchip,resetgroup-node = <2>;
+	    power-domains = <&power RK3328_PD_HEVC>;
+	    status = "okay";
+	};
+
+	h265e_mmu: iommu@ff330200 {
+	    compatible = "rockchip,iommu";
+	    reg = <0x0 0xff330200 0 0x100>;
+	    interrupts = <GIC_SPI 96 IRQ_TYPE_LEVEL_HIGH>;
+	    interrupt-names = "h265e_mmu";
+	    clocks = <&cru ACLK_H265>, <&cru PCLK_H265>;
+	    clock-names = "aclk", "iface";
+	    rockchip,disable-mmu-reset;
+	    rockchip,enable-cmd-retry;
+	    #iommu-cells = <0>;
+	    power-domains = <&power RK3328_PD_HEVC>;
+	    status = "okay";
+	};
+
+
 	vepu: vepu@ff340000 {
 		compatible = "rockchip,vpu-encoder-v2";
 		reg = <0x0 0xff340000 0x0 0x400>;
@@ -771,35 +834,6 @@
     		regulator-boot-on;
 	};
 	
-	
-	rkvenc_opp_table: opp-table-rkvenc {
-    		compatible = "operating-points-v2";
-
-    		opp-200000000 {
-    		    opp-hz = /bits/ 64 <200000000>;
-    		    opp-microvolt = <800000>;
-    		};
-		
-    		opp-400000000 {
-    		    opp-hz = /bits/ 64 <400000000>;
-    		    opp-microvolt = <850000>;
-    		};
-		
-    		opp-600000000 {
-    		    opp-hz = /bits/ 64 <600000000>;
-    		    opp-microvolt = <900000>;
-    		};
-		
-    		opp-800000000 {
-    		    opp-hz = /bits/ 64 <800000000>;
-    		    opp-microvolt = <950000>;
-    		};
-		
-    		opp-1000000000 {
-        		opp-hz = /bits/ 64 <1000000000>;
-        		opp-microvolt = <1000000>;
-    		};
-	};
 	
 	vdpu: vdpu@ff350000 {
 		compatible = "rockchip,vpu-decoder-v2";
